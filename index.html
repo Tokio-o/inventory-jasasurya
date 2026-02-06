@@ -3,24 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enterprise OS v4.5 - CV Jasa Surya</title>
+    <title>Enterprise OS v4.6 - CV Jasa Surya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* PERBAIKAN SCROLL HP: Izinkan scroll alami di body untuk mobile */
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #0f172a; 
-            margin: 0; 
-            -webkit-overflow-scrolling: touch; /* Scroll halus di iPhone */
-        }
-
-        /* Desktop tetap rapi, Mobile bisa scroll bebas */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; margin: 0; }
+        
         @media (min-width: 1024px) {
-            body { overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-            #mainDashboard { height: 90vh !important; }
+            body { overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+            #mainDashboard { height: 92vh !important; }
         }
 
         .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); }
@@ -28,13 +21,11 @@
         .sidebar-item { color: #94a3b8; transition: all 0.3s; }
         .hidden { display: none !important; }
         
-        /* Area Konten Utama agar selalu bisa di-scroll */
-        main {
-            flex: 1;
-            overflow-y: auto !important;
-            height: auto;
-            min-height: 100%;
-        }
+        /* Sidebar layout agar log out bisa dipaksa ke bawah */
+        aside { display: flex; flex-direction: column; height: 100%; }
+        .nav-content { flex-grow: 1; } /* Mengambil sisa ruang agar tombol log out terdorong ke bawah */
+        
+        main { flex: 1; overflow-y: auto !important; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -54,65 +45,71 @@
     <div id="mainDashboard" class="hidden glass-card w-full lg:max-w-[1400px] flex flex-col lg:flex-row overflow-hidden lg:rounded-[3rem] shadow-2xl">
         
         <aside class="w-full lg:w-[280px] bg-white border-b lg:border-r border-slate-100 p-6 shrink-0">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-3">
+            <div class="nav-content">
+                <div class="flex items-center gap-3 mb-10">
                     <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">f</div>
                     <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Flowly</h1>
                 </div>
+
+                <nav class="flex lg:flex-col gap-2 mb-6 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
+                    <button onclick="switchTab('stok')" id="btn-stok" class="sidebar-item active px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3 w-full text-left">📦 Inventaris</button>
+                    <button onclick="switchTab('uang')" id="btn-uang" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3 w-full text-left">💰 Keuangan</button>
+                    <button onclick="switchTab('chart')" id="btn-chart" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3 w-full text-left">📊 Analitik</button>
+                </nav>
             </div>
 
-            <nav class="flex lg:flex-col gap-2 mb-6 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
-                <button onclick="switchTab('stok')" id="btn-stok" class="sidebar-item active px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">📦 Inventaris</button>
-                <button onclick="switchTab('uang')" id="btn-uang" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">💰 Keuangan</button>
-                <button onclick="switchTab('chart')" id="btn-chart" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">📊 Analitik</button>
-            </nav>
-
-            <button onclick="logout()" class="w-full flex items-center justify-center gap-3 bg-red-600 text-white py-4 rounded-2xl font-black text-sm shadow-lg mb-4">
-                LOG OUT
-            </button>
+            <div class="pt-6 border-t border-slate-50 mt-auto">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black text-xs shadow-lg transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    LOG OUT SYSTEM
+                </button>
+                <div id="clock" class="text-center text-[10px] font-bold text-blue-500 mt-4 font-mono bg-blue-50 py-2 rounded-xl">00:00:00</div>
+            </div>
         </aside>
 
         <main class="p-6 lg:p-10 bg-slate-50/50">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h2 id="pageTitle" class="text-3xl font-black text-slate-800">Inventaris</h2>
-                    <p id="clock" class="text-xs font-bold text-blue-500 font-mono">00:00:00</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">CV Jasa Surya - Enterprise System</p>
                 </div>
-                <button onclick="exportKeExcel()" class="w-full md:w-auto bg-emerald-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg">📥 Excel</button>
+                <button onclick="exportKeExcel()" class="w-full md:w-auto bg-emerald-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">📥 Download Excel</button>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Unit</p>
-                    <h3 id="statTotal" class="text-3xl font-black">0</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-50">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Unit Stok</p>
+                    <h3 id="statTotal" class="text-4xl font-black text-slate-800">0</h3>
                 </div>
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Saldo</p>
-                    <h3 id="statSaldo" class="text-2xl font-black text-emerald-600">Rp 0</h3>
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-50">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Saldo Kas</p>
+                    <h3 id="statSaldo" class="text-3xl font-black text-emerald-600">Rp 0</h3>
                 </div>
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-50">
                     <p class="text-[10px] font-bold text-slate-400 uppercase">Status</p>
-                    <h3 id="statStatus" class="text-xl font-black text-orange-500">STABIL</h3>
+                    <h3 id="statStatus" class="text-2xl font-black text-orange-500">STABIL</h3>
                 </div>
             </div>
 
             <div id="section-stok" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-4 bg-white p-6 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                    <h4 class="font-bold text-slate-800 mb-6 text-xs uppercase tracking-tighter">Update Barang</h4>
                     <div class="space-y-4">
-                        <input type="text" id="s1" placeholder="Nama Barang" class="w-full p-4 rounded-2xl bg-slate-50 outline-none">
-                        <input type="number" id="s2" placeholder="Jumlah" class="w-full p-4 rounded-2xl bg-slate-50 outline-none">
+                        <input type="text" id="s1" placeholder="Nama Barang" class="w-full p-4 rounded-2xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="s2" placeholder="Jumlah" class="w-full p-4 rounded-2xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
                         <select id="s3" class="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none">
-                            <option value="Masuk">Masuk (+)</option>
-                            <option value="Keluar">Keluar (-)</option>
+                            <option value="Masuk">Barang Masuk (+)</option>
+                            <option value="Keluar">Barang Keluar (-)</option>
                         </select>
-                        <button onclick="simpan('stok')" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Simpan</button>
+                        <button onclick="simpan('stok')" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">Simpan Data</button>
                     </div>
                 </div>
                 <div class="lg:col-span-8 space-y-3" id="list-stok"></div>
             </div>
 
             <div id="section-uang" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-4 bg-white p-6 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                    <h4 class="font-bold text-emerald-700 mb-6 text-xs uppercase tracking-tighter">Catat Keuangan</h4>
                     <div class="space-y-4">
                         <input type="text" id="u1" placeholder="Keterangan" class="w-full p-4 rounded-2xl bg-slate-50 outline-none">
                         <input type="number" id="u2" placeholder="Nominal Rp" class="w-full p-4 rounded-2xl bg-slate-50 outline-none">
@@ -120,22 +117,22 @@
                             <option value="Masuk">Uang Masuk (+)</option>
                             <option value="Keluar">Uang Keluar (-)</option>
                         </select>
-                        <button onclick="simpan('uang')" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg">Simpan</button>
+                        <button onclick="simpan('uang')" class="w-full bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-lg">Simpan Transaksi</button>
                     </div>
                 </div>
                 <div class="lg:col-span-8 space-y-3" id="list-uang"></div>
             </div>
 
-            <div id="section-chart" class="hidden bg-white p-8 rounded-[3rem] shadow-xl h-[450px]">
-                <div class="h-full"><canvas id="mainChart"></canvas></div>
+            <div id="section-chart" class="hidden bg-white p-10 rounded-[3rem] shadow-xl h-[500px]">
+                <div class="h-full pb-10"><canvas id="mainChart"></canvas></div>
             </div>
             
-            <div class="h-20 lg:hidden"></div>
+            <div class="h-24 lg:hidden"></div>
         </main>
     </div>
 
     <script>
-        // Logika database tetap sama agar data tidak hilang
+        // Gunakan database v44 agar sinkron dengan data sebelumnya
         let db_stok = JSON.parse(localStorage.getItem('v44_stok')) || [];
         let db_uang = JSON.parse(localStorage.getItem('v44_uang')) || [];
         let currentTab = 'stok';
@@ -148,13 +145,15 @@
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 refreshData();
-            } else { alert("User/Pass Salah!"); }
+            } else { alert("Akses Ditolak!"); }
         }
 
         function logout() {
-            if(confirm("Keluar?")) {
+            if(confirm("Keluar dari Sistem CV Jasa Surya?")) {
                 document.getElementById('mainDashboard').classList.add('hidden');
                 document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('user').value = '';
+                document.getElementById('pass').value = '';
             }
         }
 
@@ -168,8 +167,6 @@
             document.getElementById('btn-'+t).classList.add('active');
             document.getElementById('pageTitle').innerText = t==='stok'?'Inventaris':t==='uang'?'Keuangan':'Analitik';
             if(t === 'chart') initChart();
-            // Scroll ke atas saat ganti tab
-            window.scrollTo(0,0);
         }
 
         function simpan(type) {
@@ -177,7 +174,7 @@
             const v2 = parseInt(document.getElementById(type==='stok'?'s2':'u2').value);
             const v3 = document.getElementById(type==='stok'?'s3':'u3').value;
             const time = new Date().toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            if(!v1 || isNaN(v2)) return alert("Isi data!");
+            if(!v1 || isNaN(v2)) return alert("Data tidak lengkap!");
             if(type === 'stok') {
                 db_stok.unshift({ nama: v1, qty: v2, tipe: v3, waktu: time });
                 localStorage.setItem('v44_stok', JSON.stringify(db_stok));
@@ -191,7 +188,7 @@
         }
 
         function hapus(type, i) {
-            if(!confirm("Hapus?")) return;
+            if(!confirm("Hapus data?")) return;
             if(type==='stok') db_stok.splice(i, 1); else db_uang.splice(i, 1);
             localStorage.setItem(type==='stok'?'v44_stok':'v44_uang', JSON.stringify(type==='stok'?db_stok:db_uang));
             refreshData();
@@ -204,39 +201,40 @@
             let sTotal = 0;
             db_stok.forEach((x, i) => {
                 sTotal += (x.tipe === 'Masuk' ? x.qty : -x.qty);
-                lStok.innerHTML += `<div class="bg-white p-4 px-6 rounded-3xl flex items-center justify-between shadow-sm border border-slate-50">
+                lStok.innerHTML += `<div class="bg-white p-5 px-8 rounded-[2rem] flex items-center justify-between shadow-sm border border-slate-50 hover:border-blue-100 transition">
                     <div><p class="font-bold text-slate-700 text-sm">${x.nama}</p><p class="text-[10px] text-slate-400 font-bold uppercase">${x.waktu}</p></div>
-                    <div class="flex items-center gap-4">
-                        <span class="text-[8px] font-black px-2 py-1 rounded-full ${x.tipe==='Masuk'?'bg-blue-50 text-blue-500':'bg-orange-50 text-orange-500'}">${x.tipe.toUpperCase()}</span>
-                        <p class="font-black text-slate-800 text-sm w-10 text-right">${x.qty}</p>
-                        <button onclick="hapus('stok',${i})" class="text-red-300">✕</button>
+                    <div class="flex items-center gap-5">
+                        <span class="text-[9px] font-black px-3 py-1 rounded-full ${x.tipe==='Masuk'?'bg-blue-50 text-blue-500':'bg-orange-50 text-orange-500'}">${x.tipe.toUpperCase()}</span>
+                        <p class="font-black text-slate-800 text-base w-10 text-right">${x.qty}</p>
+                        <button onclick="hapus('stok',${i})" class="text-red-300 hover:text-red-500 transition-colors">✕</button>
                     </div>
                 </div>`;
             });
             let uTotal = 0;
             db_uang.forEach((x, i) => {
                 uTotal += (x.tipe === 'Masuk' ? x.nominal : -x.nominal);
-                lUang.innerHTML += `<div class="bg-white p-4 px-6 rounded-3xl flex items-center justify-between shadow-sm border border-slate-50">
+                lUang.innerHTML += `<div class="bg-white p-5 px-8 rounded-[2rem] flex items-center justify-between shadow-sm border border-slate-50 hover:border-emerald-100 transition">
                     <div><p class="font-bold text-slate-700 text-sm">${x.ket}</p><p class="text-[10px] text-slate-400 font-bold uppercase">${x.waktu}</p></div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-5">
                         <p class="font-black ${x.tipe==='Masuk'?'text-emerald-600':'text-red-500'} text-sm">Rp ${x.nominal.toLocaleString()}</p>
-                        <button onclick="hapus('uang',${i})" class="text-red-300">✕</button>
+                        <button onclick="hapus('uang',${i})" class="text-red-300 hover:text-red-500">✕</button>
                     </div>
                 </div>`;
             });
             document.getElementById('statTotal').innerText = sTotal;
             document.getElementById('statSaldo').innerText = "Rp " + uTotal.toLocaleString('id-ID');
-            document.getElementById('statStatus').innerText = sTotal < 5 ? "KRITIS" : "STABIL";
-            document.getElementById('statStatus').className = sTotal < 5 ? "text-xl font-black text-red-500 uppercase" : "text-xl font-black text-emerald-500 uppercase";
+            const st = document.getElementById('statStatus');
+            st.innerText = sTotal < 5 ? "KRITIS" : "STABIL";
+            st.className = sTotal < 5 ? "text-2xl font-black text-red-500 uppercase italic" : "text-2xl font-black text-emerald-500 uppercase italic";
         }
 
         function exportKeExcel() {
             const data = currentTab === 'stok' ? db_stok : db_uang;
-            if(data.length === 0) return alert("Kosong!");
+            if(data.length === 0) return alert("Data kosong!");
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data");
-            XLSX.writeFile(wb, `Laporan_${currentTab}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Report");
+            XLSX.writeFile(wb, `Laporan_JasaSurya_${currentTab}.xlsx`);
         }
 
         function initChart() {
@@ -246,7 +244,7 @@
             const outSum = db_uang.filter(u => u.tipe==='Keluar').reduce((a,b)=>a+b.nominal,0);
             chartObj = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['Masuk', 'Keluar'], datasets: [{ data: [inSum, outSum], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 15 }] },
+                data: { labels: ['Masuk', 'Keluar'], datasets: [{ data: [inSum, outSum], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 20 }] },
                 options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
