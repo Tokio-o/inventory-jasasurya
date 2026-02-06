@@ -3,25 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Jasa Surya - Enterprise Pro</title>
+    <title>Sistem Enterprise Pro - CV Jasa Surya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .sidebar-gradient { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
         .hidden { display: none; }
-        .active-tab { background: #2563eb !important; color: white !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         
-        /* Animasi Transisi Menu */
+        /* Proteksi angka agar tidak berantakan */
+        .truncate-number { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; display: block; }
+
+        /* Animasi Halaman */
         .page-transition { animation: slideUpFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes slideUpFade { 
             from { opacity: 0; transform: translateY(15px); } 
             to { opacity: 1; transform: translateY(0); } 
         }
 
-        .truncate-number { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* Notifikasi Stok Kritis */
+        @keyframes pulse-red { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #fecaca; } }
+        .low-stock-row { animation: pulse-red 2s infinite; color: #dc2626; font-weight: bold; }
+        
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3498db; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="text-slate-800">
@@ -30,31 +38,31 @@
         <div class="bg-white p-10 rounded-[2.5rem] card-shadow w-full max-w-md border border-slate-200">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-extrabold text-slate-900 tracking-tighter">CV JASA SURYA</h2>
-                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">Inventory System</p>
+                <p class="text-slate-500 text-sm font-medium uppercase tracking-widest mt-2">Inventory System</p>
             </div>
             <div class="space-y-4">
-                <input type="text" id="username" placeholder="Username" class="w-full px-6 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg">Masuk</button>
+                <input type="text" id="username" placeholder="Username" class="w-full px-6 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Masuk</button>
             </div>
         </div>
     </div>
 
     <div id="mainDashboard" class="hidden min-h-screen flex flex-col md:flex-row">
-        <aside class="w-full md:w-72 sidebar-gradient text-white p-8 flex flex-col">
+        <aside class="w-full md:w-72 sidebar-gradient text-white p-8 flex flex-col transition-all">
             <div class="mb-10">
                 <h1 class="text-2xl font-black tracking-tighter">JASA SURYA</h1>
-                <span id="userRoleBadge" class="text-[10px] bg-blue-500/30 text-blue-200 px-2 py-1 rounded-md mt-2 inline-block font-bold border border-blue-500/40 uppercase"></span>
+                <span id="userRoleBadge" class="text-[10px] bg-blue-500/30 text-blue-200 px-2 py-1 rounded-md mt-2 inline-block font-bold border border-blue-500/40"></span>
             </div>
             <nav class="space-y-2 flex-1">
-                <button onclick="switchTab('stok')" id="tabStok" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition text-sm text-left active-tab">Inventaris Buku</button>
+                <button onclick="switchTab('stok')" id="tabStok" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold active-tab transition text-sm text-left">Inventaris Buku</button>
                 <button onclick="switchTab('keuangan')" id="tabKeuangan" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm text-left">Laporan Keuangan</button>
                 <button onclick="switchTab('analitik')" id="tabAnalitik" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm text-left">Analitik & Grafik</button>
                 <button onclick="switchTab('pengaturan')" id="tabPengaturan" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm text-left">Pengaturan</button>
             </nav>
             <div class="mt-auto pt-6 border-t border-slate-700">
                 <p id="realTimeClock" class="text-2xl font-mono font-bold text-blue-400">00:00:00</p>
-                <button onclick="location.reload()" class="w-full mt-4 bg-red-500/10 text-red-400 border border-red-500/20 py-3 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition">Sign Out</button>
+                <button onclick="handleLogout()" class="w-full mt-4 bg-red-500/10 text-red-400 border border-red-500/20 py-3 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition">Sign Out</button>
             </div>
         </aside>
 
@@ -68,46 +76,52 @@
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Saldo Kas</p>
                     <p id="statSaldo" class="text-2xl font-black mt-2 text-emerald-600 truncate-number">Rp 0</p>
                 </div>
-                <div class="bg-orange-500 p-8 rounded-[2rem] card-shadow text-white">
-                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Status Stok</p>
-                    <p id="statAlert" class="text-4xl font-black mt-2">AMAN</p>
+                <div class="bg-orange-500 p-8 rounded-[2rem] card-shadow text-white shadow-lg shadow-orange-100">
+                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Limit Stok</p>
+                    <p id="statAlert" class="text-4xl font-black mt-2">0</p>
                 </div>
             </div>
 
-            <div id="contentArea">
-                <div id="sectionStok" class="page-transition grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] card-shadow border h-fit">
-                        <h3 class="font-black text-xl mb-6">Input Buku</h3>
-                        <input type="text" id="bukuNama" placeholder="Nama Buku" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none">
-                        <input type="number" id="bukuQty" placeholder="Jumlah" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none">
+            <div id="sectionStok" class="page-transition grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border">
+                        <h3 class="font-black text-xl mb-6">Update Stok</h3>
+                        <input type="text" id="bukuNama" placeholder="Nama Buku" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="bukuQty" placeholder="Jumlah (Qty)" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                         <select id="bukuTipe" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl font-bold outline-none">
-                            <option value="Masuk">Masuk (+)</option>
-                            <option value="Keluar">Keluar (-)</option>
+                            <option value="Masuk">Buku Masuk (+)</option>
+                            <option value="Keluar">Buku Keluar (-)</option>
                         </select>
-                        <button onclick="tambahBuku()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Simpan</button>
+                        <button onclick="tambahBuku()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition">Simpan Perubahan</button>
                     </div>
-                    <div class="lg:col-span-8 bg-white rounded-[2.5rem] card-shadow border overflow-hidden">
+                </div>
+                <div class="lg:col-span-8 bg-white rounded-[2.5rem] card-shadow border overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b">
-                                <tr><th class="p-6">Waktu</th><th class="p-6">Judul</th><th class="p-6">Status</th><th class="p-6">Qty</th><th class="p-6">Aksi</th></tr>
+                                <tr><th class="p-6">Waktu</th><th class="p-6">Judul Buku</th><th class="p-6 text-center">Status</th><th class="p-6 text-center">Qty</th><th class="p-6 text-center">Aksi</th></tr>
                             </thead>
                             <tbody id="listBuku" class="divide-y text-sm"></tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <div id="sectionKeuangan" class="hidden page-transition grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] card-shadow border h-fit">
-                        <h3 class="font-black text-xl mb-6 text-emerald-700">Input Kas</h3>
-                        <input type="text" id="uangKet" placeholder="Keterangan" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none">
-                        <input type="number" id="uangNominal" placeholder="Nominal" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none">
+            <div id="sectionKeuangan" class="hidden page-transition grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border">
+                        <h3 class="font-black text-xl mb-6 text-emerald-700">Catat Keuangan</h3>
+                        <input type="text" id="uangKet" placeholder="Keterangan" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="number" id="uangNominal" placeholder="Nominal Rp" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
                         <select id="uangTipe" class="w-full p-4 mb-4 bg-slate-50 border rounded-2xl font-bold outline-none">
-                            <option value="Masuk">Masuk (+)</option>
-                            <option value="Keluar">Keluar (-)</option>
+                            <option value="Masuk">Uang Masuk (+)</option>
+                            <option value="Keluar">Uang Keluar (-)</option>
                         </select>
-                        <button onclick="tambahUang()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg">Simpan</button>
+                        <button onclick="tambahUang()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition">Simpan Transaksi</button>
                     </div>
-                    <div class="lg:col-span-8 bg-white rounded-[2.5rem] card-shadow border overflow-hidden">
+                </div>
+                <div class="lg:col-span-8 bg-white rounded-[2.5rem] card-shadow border overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400 border-b">
                                 <tr><th class="p-6">Waktu</th><th class="p-6">Keterangan</th><th class="p-6 text-center">Nominal</th><th class="p-6 text-center">Aksi</th></tr>
@@ -116,33 +130,37 @@
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <div id="sectionAnalitik" class="hidden page-transition">
-                    <div class="bg-white p-10 rounded-[2.5rem] card-shadow border h-[450px]">
+            <div id="sectionAnalitik" class="hidden page-transition">
+                <div class="bg-white p-10 rounded-[2.5rem] card-shadow border h-[500px] flex flex-col">
+                    <h3 class="font-black text-xl mb-6">Perbandingan Arus Kas</h3>
+                    <div class="flex-1 min-h-0">
                         <canvas id="cashFlowChart"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div id="sectionPengaturan" class="hidden page-transition">
-                    <div class="bg-white p-10 rounded-[2.5rem] card-shadow border max-w-md">
-                        <h3 class="font-black text-xl mb-4 text-red-600">Database</h3>
-                        <button onclick="resetData()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-bold">Hapus & Reset Semua Data</button>
-                    </div>
+            <div id="sectionPengaturan" class="hidden page-transition">
+                <div class="bg-white p-10 rounded-[2.5rem] card-shadow border max-w-md">
+                    <h3 class="font-black text-xl mb-2 text-red-600">Database Management</h3>
+                    <p class="text-sm text-slate-500 mb-8">Gunakan ini jika angka stok atau saldo kamu berantakan/error.</p>
+                    <button onclick="resetData()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-bold hover:bg-red-700 transition shadow-xl shadow-red-100">Reset Semua Data & Refresh</button>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        let dataBuku = JSON.parse(localStorage.getItem('jasa_surya_db_buku')) || [];
-        let dataUang = JSON.parse(localStorage.getItem('jasa_surya_db_uang')) || [];
+        let dataBuku = JSON.parse(localStorage.getItem('jasa_surya_v3_buku')) || [];
+        let dataUang = JSON.parse(localStorage.getItem('jasa_surya_v3_uang')) || [];
         let currentUser = null;
         let chartInstance = null;
 
         function updateClock() {
             document.getElementById('realTimeClock').innerText = new Date().toLocaleTimeString('id-ID');
         }
-        setInterval(updateClock, 1000);
+        setInterval(updateClock, 1000); updateClock();
 
         function handleLogin() {
             const u = document.getElementById('username').value;
@@ -153,28 +171,27 @@
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 document.getElementById('userRoleBadge').innerText = currentUser;
                 renderAll();
-            } else { alert("Login Gagal!"); }
+            } else { alert("User/Pass salah! Gunakan admin/admin"); }
         }
 
-        function switchTab(tabName) {
-            // Sembunyikan semua section
-            const sections = ['sectionStok', 'sectionKeuangan', 'sectionAnalitik', 'sectionPengaturan'];
-            sections.forEach(s => document.getElementById(s).classList.add('hidden'));
-            
-            // Tampilkan yang dipilih
-            const targetId = 'section' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-            document.getElementById(targetId).classList.remove('hidden');
+        function handleLogout() { location.reload(); }
 
-            // Update style tombol sidebar
-            const tabs = ['tabStok', 'tabKeuangan', 'tabAnalitik', 'tabPengaturan'];
-            tabs.forEach(t => document.getElementById(t).classList.remove('active-tab', 'text-white'));
-            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active-tab');
-
-            if(tabName === 'analitik') initChart();
+        function switchTab(tab) {
+            ['stok', 'keuangan', 'analitik', 'pengaturan'].forEach(t => {
+                document.getElementById('section' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('hidden');
+                document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).className = 'w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm text-left';
+            });
+            const activeSec = document.getElementById('section' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            activeSec.classList.remove('hidden');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = 'w-full flex items-center gap-3 p-4 rounded-2xl font-bold active-tab transition text-sm text-left';
+            if(tab === 'analitik') initChart();
         }
 
         function resetData() {
-            if(confirm("Hapus semua?")) { localStorage.clear(); location.reload(); }
+            if(confirm("AWAS: Ini akan menghapus seluruh data transaksi. Lanjutkan?")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         function tambahBuku() {
@@ -182,8 +199,8 @@
             const q = parseInt(document.getElementById('bukuQty').value);
             const t = document.getElementById('bukuTipe').value;
             if(n && q) {
-                dataBuku.unshift({ id: Date.now(), nama: n, qty: q, tipe: t, waktu: new Date().toLocaleDateString() });
-                localStorage.setItem('jasa_surya_db_buku', JSON.stringify(dataBuku));
+                dataBuku.unshift({ id: Date.now(), nama: n, qty: q, tipe: t, waktu: new Date().toLocaleString('id-ID', {day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit'}) });
+                localStorage.setItem('jasa_surya_v3_buku', JSON.stringify(dataBuku));
                 renderAll();
                 document.getElementById('bukuNama').value = ''; document.getElementById('bukuQty').value = '';
             }
@@ -194,33 +211,34 @@
             const n = parseFloat(document.getElementById('uangNominal').value);
             const t = document.getElementById('uangTipe').value;
             if(k && n) {
-                dataUang.unshift({ id: Date.now(), ket: k, nominal: n, tipe: t, waktu: new Date().toLocaleDateString() });
-                localStorage.setItem('jasa_surya_db_uang', JSON.stringify(dataUang));
+                dataUang.unshift({ id: Date.now(), ket: k, nominal: n, tipe: t, waktu: new Date().toLocaleString('id-ID', {day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit'}) });
+                localStorage.setItem('jasa_surya_v3_uang', JSON.stringify(dataUang));
                 renderAll();
                 document.getElementById('uangKet').value = ''; document.getElementById('uangNominal').value = '';
             }
         }
 
         function renderAll() {
-            // Render Stok & Hitung Total (Matematika Fix)
             const listBuku = document.getElementById('listBuku'); listBuku.innerHTML = '';
-            let totalStok = 0;
+            let totalStok = 0; let lowCount = 0;
+            
+            // LOGIKA FIXED: Urutkan data untuk hitung total, tapi render dari yang terbaru
             dataBuku.slice().reverse().forEach(b => {
                 if(b.tipe === 'Masuk') totalStok += b.qty;
                 else totalStok -= b.qty;
             });
 
             dataBuku.forEach(b => {
-                listBuku.innerHTML += `<tr class="border-b">
-                    <td class="p-6 text-slate-400">${b.waktu}</td>
-                    <td class="p-6 font-bold">${b.nama}</td>
-                    <td class="p-6"><span class="px-2 py-1 rounded-lg text-[10px] ${b.tipe==='Masuk'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'}">${b.tipe}</span></td>
-                    <td class="p-6 font-black">${b.qty}</td>
-                    <td class="p-6">${currentUser==='OWNER' ? `<button onclick="hapus('buku',${b.id})" class="text-red-400">Hapus</button>` : '-'}</td>
+                if(totalStok <= 5) lowCount = 1; // Simplifikasi alert
+                listBuku.innerHTML += `<tr class="hover:bg-slate-50 border-b">
+                    <td class="p-6 text-xs text-slate-400 font-mono">${b.waktu}</td>
+                    <td class="p-6 font-bold text-slate-700">${b.nama}</td>
+                    <td class="p-6 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black ${b.tipe==='Masuk'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'}">${b.tipe}</span></td>
+                    <td class="p-6 text-center font-black">${b.qty}</td>
+                    <td class="p-6 text-center">${currentUser==='OWNER' ? `<button onclick="hapus('buku',${b.id})" class="text-red-400 hover:text-red-600 font-bold">Hapus</button>` : '-'}</td>
                 </tr>`;
             });
 
-            // Render Uang & Hitung Saldo
             const listUang = document.getElementById('listUang'); listUang.innerHTML = '';
             let saldo = 0;
             dataUang.slice().reverse().forEach(u => {
@@ -228,28 +246,31 @@
             });
 
             dataUang.forEach(u => {
-                listUang.innerHTML += `<tr class="border-b">
-                    <td class="p-6 text-slate-400">${u.waktu}</td>
-                    <td class="p-6 font-bold">${u.ket}</td>
-                    <td class="p-6 text-center font-black ${u.tipe==='Masuk'?'text-emerald-600':'text-red-600'}">Rp ${u.nominal.toLocaleString()}</td>
-                    <td class="p-6 text-center">${currentUser==='OWNER' ? `<button onclick="hapus('uang',${u.id})" class="text-red-400">Hapus</button>` : '-'}</td>
+                listUang.innerHTML += `<tr class="hover:bg-slate-50 border-b">
+                    <td class="p-6 text-xs text-slate-400 font-mono">${u.waktu}</td>
+                    <td class="p-6 font-bold text-slate-700">${u.ket}</td>
+                    <td class="p-6 text-center font-black ${u.tipe==='Masuk'?'text-emerald-600':'text-red-600'}">Rp ${u.nominal.toLocaleString('id-ID')}</td>
+                    <td class="p-6 text-center">${currentUser==='OWNER' ? `<button onclick="hapus('uang',${u.id})" class="text-red-400 hover:text-red-600 font-bold">Hapus</button>` : '-'}</td>
                 </tr>`;
             });
 
             document.getElementById('statTotalBuku').innerText = totalStok;
-            document.getElementById('statAlert').innerText = (totalStok <= 5) ? "KRITIS" : "AMAN";
+            document.getElementById('statAlert').innerText = (totalStok <= 5 && totalStok > 0) ? "KRITIS" : "AMAN";
             
             if(currentUser === 'STAFF') {
                 document.getElementById('statSaldo').innerText = "********";
+                document.getElementById('cardSaldo').classList.add('opacity-40');
             } else {
                 document.getElementById('statSaldo').innerText = "Rp " + saldo.toLocaleString('id-ID');
+                document.getElementById('cardSaldo').classList.remove('opacity-40');
             }
         }
 
         function hapus(type, id) {
+            if(!confirm("Hapus data ini?")) return;
             if(type === 'buku') dataBuku = dataBuku.filter(x => x.id !== id);
             else dataUang = dataUang.filter(x => x.id !== id);
-            localStorage.setItem(type === 'buku' ? 'jasa_surya_db_buku' : 'jasa_surya_db_uang', JSON.stringify(type === 'buku' ? dataBuku : dataUang));
+            localStorage.setItem(type === 'buku' ? 'jasa_surya_v3_buku' : 'jasa_surya_v3_uang', JSON.stringify(type === 'buku' ? dataBuku : dataUang));
             renderAll();
         }
 
@@ -262,7 +283,11 @@
                 type: 'bar',
                 data: {
                     labels: ['Masuk', 'Keluar'],
-                    datasets: [{ data: [m, k], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 10 }]
+                    datasets: [{
+                        data: [m, k],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 10
+                    }]
                 },
                 options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
