@@ -3,224 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowly Enterprise - Jasa Surya</title>
+    <title>Enterprise OS - Jasa Surya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; padding: 0; }
+        .glass-bg { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); }
+        .dashboard-container { display: none; min-height: 100vh; }
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* Fix untuk angka saldo yang sangat panjang */
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        .nav-active {
-            background: #eff6ff;
-            color: #2563eb !important;
-        }
+
+        /* Animasi Transisi */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="lg:flex lg:items-center lg:justify-center p-0 lg:p-6">
+<body class="glass-bg">
 
-    <div id="loginSection" class="min-h-screen flex items-center justify-center p-6 w-full">
-        <div class="glass-card p-10 lg:p-14 rounded-[3rem] w-full max-w-md shadow-2xl text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black italic text-2xl mx-auto mb-6 shadow-xl shadow-blue-200">f</div>
-            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h2>
-            <p class="text-slate-400 font-medium mb-10 text-sm">Enterprise System - CV Jasa Surya</p>
+    <div id="loginPage" class="login-container fade-in">
+        <div class="bg-white p-8 lg:p-12 rounded-[2.5rem] w-full max-w-md shadow-2xl text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black italic text-2xl mx-auto mb-6">f</div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight">Admin Login</h2>
+            <p class="text-slate-400 font-medium mb-8 text-sm">Jasa Surya System</p>
             
             <div class="space-y-4 text-left">
-                <div class="group">
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 mb-1 block">Username</label>
-                    <input type="text" id="user" placeholder="admin" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <div class="group">
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 mb-1 block">Password</label>
-                    <input type="password" id="pass" placeholder="••••••••" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <button onclick="login()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all mt-6">Masuk ke Dashboard</button>
+                <input type="text" id="user" placeholder="Username" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <input type="password" id="pass" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all">Login</button>
             </div>
         </div>
     </div>
 
-    <div id="mainDashboard" class="hidden glass-card w-full lg:max-w-[1400px] lg:h-[90vh] lg:rounded-[3rem] flex flex-col lg:flex-row overflow-hidden shadow-2xl">
-        
-        <aside class="w-full lg:w-[280px] bg-white border-b lg:border-r border-slate-100 p-6 lg:p-10 flex lg:flex-col justify-between items-center lg:items-start">
+    <div id="dashboardPage" class="dashboard-container fade-in lg:flex">
+        <aside class="w-full lg:w-[280px] bg-white border-b lg:border-r border-slate-100 p-6 lg:p-10 flex lg:flex-col justify-between items-center lg:items-start sticky top-0 z-50">
             <div class="flex items-center gap-3 lg:mb-12">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-blue-100">f</div>
-                <h1 class="hidden lg:block text-2xl font-black text-slate-800 tracking-tighter uppercase">Flowly</h1>
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">f</div>
+                <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Flowly</h1>
             </div>
 
-            <nav class="flex lg:flex-col gap-2 flex-1">
-                <button onclick="switchTab('stok')" id="btn-stok" class="nav-active px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all flex items-center gap-3">
-                    <span class="lg:block">Inventaris</span>
-                </button>
-                <button onclick="switchTab('uang')" id="btn-uang" class="text-slate-400 px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all flex items-center gap-3 hover:bg-slate-50">
-                    <span class="lg:block">Keuangan</span>
-                </button>
+            <nav class="hidden lg:flex flex-col gap-2 w-full flex-1">
+                <div class="bg-blue-50 text-blue-600 px-6 py-4 rounded-2xl font-bold text-sm">Dashboard</div>
+                <div class="text-slate-400 px-6 py-4 rounded-2xl font-bold text-sm hover:bg-slate-50 cursor-pointer">Transaksi</div>
             </nav>
 
-            <button onclick="location.reload()" class="text-red-400 font-bold text-sm px-4 hidden lg:block hover:text-red-600">Sign Out</button>
+            <button onclick="handleLogout()" class="text-red-500 font-bold text-sm px-4 flex items-center gap-2 hover:bg-red-50 p-3 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                <span>Log Out</span>
+            </button>
         </aside>
 
-        <main class="flex-1 p-6 lg:p-12 overflow-y-auto bg-slate-50/30">
+        <main class="flex-1 p-4 lg:p-10 bg-[#f8fafc]">
             <header class="flex justify-between items-center mb-8">
                 <div>
-                    <h2 class="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight">Ringkasan</h2>
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1" id="roleText">OWNER ACCESS</p>
+                    <h2 class="text-2xl lg:text-3xl font-black text-slate-800">Overview</h2>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Administrator Access</p>
                 </div>
-                <div id="clock" class="font-mono font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl text-xs lg:text-sm">00:00:00</div>
+                <div id="clock" class="hidden lg:block font-mono font-bold text-blue-600">00:00:00</div>
             </header>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-8">
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Total Unit</p>
-                    <h3 id="statTotal" class="text-xl lg:text-3xl font-black text-slate-800">0</h3>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Total Unit Stok</p>
+                    <h3 id="statTotal" class="text-2xl lg:text-4xl font-black text-slate-800 text-truncate">0</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Saldo Kas</p>
-                    <h3 id="statSaldo" class="text-sm lg:text-xl font-black text-emerald-600 truncate">Rp 0</h3>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Saldo Kas</p>
+                    <h3 id="statSaldo" class="text-2xl lg:text-3xl font-black text-emerald-600 text-truncate">Rp 0</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Status</p>
-                    <h3 id="statStatus" class="text-xs lg:text-sm font-black text-orange-500 uppercase italic">Aman</h3>
-                </div>
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hidden lg:block">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Sistem</p>
-                    <h3 class="text-xs lg:text-sm font-black text-blue-500 uppercase">Online</h3>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Status Stok</p>
+                    <h3 id="statStatus" class="text-xl font-black text-orange-500 italic">STABLE</h3>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-4">
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50">
-                        <h4 class="font-black text-slate-800 mb-6 flex items-center gap-2">
-                            Update Data
-                        </h4>
-                        <div id="formFields" class="space-y-4"></div>
-                        <button onclick="handleProcess()" class="w-full mt-6 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100 hover:scale-[1.02] transition-all">Proses Data</button>
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 sticky top-28">
+                        <h4 class="font-black text-slate-800 mb-6">Input Data</h4>
+                        <div class="space-y-4">
+                            <input type="text" id="v1" placeholder="Nama Item" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="v2" placeholder="Jumlah / Nominal" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="v3" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold outline-none">
+                                <option value="Masuk">Masuk (+)</option>
+                                <option value="Keluar">Keluar (-)</option>
+                            </select>
+                            <button onclick="saveData()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition-all">Simpan Perubahan</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="lg:col-span-8">
-                    <div id="tableContainer" class="space-y-3"></div>
+                    <div class="flex justify-between items-center mb-4 px-2">
+                        <h4 class="font-bold text-slate-800 text-sm">Aktivitas Terkini</h4>
+                        <button onclick="clearData()" class="text-red-400 text-[10px] font-bold uppercase hover:text-red-600 transition-all">Hapus Semua</button>
+                    </div>
+                    <div id="tableContainer" class="space-y-3">
+                        </div>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        let db_stok = JSON.parse(localStorage.getItem('fl_stok_v2')) || [];
-        let db_uang = JSON.parse(localStorage.getItem('fl_uang_v2')) || [];
-        let view = 'stok';
+        let db = JSON.parse(localStorage.getItem('js_db')) || [];
 
-        function login() {
+        function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
             if(u === 'admin' && p === 'admin') {
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboardPage').style.display = 'flex';
                 render();
-            } else { alert("Login Gagal!"); }
+            } else { alert("User/Pass Salah!"); }
         }
 
-        function switchTab(t) {
-            view = t;
-            document.getElementById('btn-stok').className = t==='stok' ? 'nav-active px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all' : 'text-slate-400 px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all hover:bg-slate-50';
-            document.getElementById('btn-uang').className = t==='uang' ? 'nav-active px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all' : 'text-slate-400 px-6 py-3 lg:w-full rounded-2xl font-bold text-sm transition-all hover:bg-slate-50';
+        function handleLogout() {
+            if(confirm("Apakah anda ingin keluar?")) {
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('user').value = '';
+                document.getElementById('pass').value = '';
+            }
+        }
+
+        function saveData() {
+            const name = document.getElementById('v1').value;
+            const val = parseInt(document.getElementById('v2').value);
+            const type = document.getElementById('v3').value;
+            const time = new Date().toLocaleString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+            if(!name || !val) return alert("Isi data dengan lengkap!");
+
+            db.unshift({ name, val, type, time });
+            localStorage.setItem('js_db', JSON.stringify(db));
+            
+            // Reset form
+            document.getElementById('v1').value = '';
+            document.getElementById('v2').value = '';
             render();
         }
 
         function render() {
-            const form = document.getElementById('formFields');
-            const list = document.getElementById('tableContainer');
-            list.innerHTML = '';
-
-            if(view === 'stok') {
-                form.innerHTML = `
-                    <input type="text" id="v1" placeholder="Judul Buku" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500">
-                    <input type="number" id="v2" placeholder="Qty" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-blue-500">
-                    <select id="v3" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold outline-none">
-                        <option value="Masuk">Masuk (+)</option>
-                        <option value="Keluar">Keluar (-)</option>
-                    </select>
-                `;
-                db_stok.forEach((i, idx) => {
-                    list.innerHTML += `
-                        <div class="bg-white flex items-center justify-between p-5 px-8 rounded-3xl shadow-sm border border-slate-50">
-                            <div><p class="font-bold text-slate-700">${i.name}</p><p class="text-[10px] text-slate-400 font-bold">${i.time}</p></div>
-                            <div class="flex items-center gap-6">
-                                <span class="text-[10px] font-black uppercase ${i.type==='Masuk'?'text-blue-500':'text-orange-500'}">${i.type}</span>
-                                <p class="font-black text-slate-800 text-sm">${i.qty}</p>
-                                <button onclick="del('stok',${idx})" class="text-red-300 hover:text-red-500 text-xs">✕</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                form.innerHTML = `
-                    <input type="text" id="v1" placeholder="Keterangan" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500">
-                    <input type="number" id="v2" placeholder="Nominal (Rp)" class="w-full p-4 rounded-xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500">
-                    <select id="v3" class="w-full p-4 rounded-xl bg-slate-50 border-none font-bold outline-none">
-                        <option value="Masuk">Masuk (+)</option>
-                        <option value="Keluar">Keluar (-)</option>
-                    </select>
-                `;
-                db_uang.forEach((i, idx) => {
-                    list.innerHTML += `
-                        <div class="bg-white flex items-center justify-between p-5 px-8 rounded-3xl shadow-sm border border-slate-50">
-                            <div><p class="font-bold text-slate-700">${i.name}</p><p class="text-[10px] text-slate-400 font-bold">${i.time}</p></div>
-                            <div class="flex items-center gap-6">
-                                <p class="font-black ${i.type==='Masuk'?'text-emerald-600':'text-red-500'} text-sm">Rp ${i.qty.toLocaleString()}</p>
-                                <button onclick="del('uang',${idx})" class="text-red-300 hover:text-red-500 text-xs">✕</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            stats();
-        }
-
-        function handleProcess() {
-            const n = document.getElementById('v1').value;
-            const q = parseInt(document.getElementById('v2').value);
-            const t = document.getElementById('v3').value;
-            const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-            if(!n || !q) return;
-
-            if(view === 'stok') {
-                db_stok.unshift({ name: n, qty: q, type: t, time });
-                localStorage.setItem('fl_stok_v2', JSON.stringify(db_stok));
-            } else {
-                db_uang.unshift({ name: n, qty: q, type: t, time });
-                localStorage.setItem('fl_uang_v2', JSON.stringify(db_uang));
-            }
-            render();
-            document.getElementById('v1').value = ''; document.getElementById('v2').value = '';
-        }
-
-        function del(t, i) {
-            if(t==='stok') db_stok.splice(i, 1); else db_uang.splice(i, 1);
-            localStorage.setItem(t==='stok' ? 'fl_stok_v2' : 'fl_uang_v2', JSON.stringify(t==='stok' ? db_stok : db_uang));
-            render();
-        }
-
-        function stats() {
-            let s = 0; db_stok.forEach(i => { if(i.type==='Masuk') s+=i.qty; else s-=i.qty; });
-            document.getElementById('statTotal').innerText = s;
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '';
             
-            let u = 0; db_uang.forEach(i => { if(i.type==='Masuk') u+=i.qty; else u-=i.qty; });
-            document.getElementById('statSaldo').innerText = "Rp " + u.toLocaleString('id-ID');
+            let totalStok = 0;
+            let totalSaldo = 0;
 
-            const st = document.getElementById('statStatus');
-            if(s <= 5) { st.innerText = "Kritis"; st.className = "text-xs lg:text-sm font-black text-red-500 italic"; }
-            else { st.innerText = "Aman"; st.className = "text-xs lg:text-sm font-black text-emerald-500 italic"; }
+            db.forEach((item, index) => {
+                // Hitung Statistik
+                if(item.type === 'Masuk') {
+                    totalStok += item.val;
+                    totalSaldo += (item.val * 1000); // Contoh asumsi nominal uang
+                } else {
+                    totalStok -= item.val;
+                    totalSaldo -= (item.val * 1000);
+                }
+
+                // Render Baris
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-3xl flex items-center justify-between border border-slate-50 shadow-sm">
+                        <div class="flex-1">
+                            <p class="font-bold text-slate-700 text-sm">${item.name}</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">${item.time}</p>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <span class="text-[10px] font-black px-3 py-1 rounded-full ${item.type==='Masuk'?'bg-blue-50 text-blue-500':'bg-orange-50 text-orange-500'}">${item.type}</span>
+                            <p class="font-black text-slate-800 text-sm w-20 text-right">${item.val.toLocaleString()}</p>
+                            <button onclick="removeItem(${index})" class="text-red-300 hover:text-red-500 transition-all font-bold">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update UI Stats
+            document.getElementById('statTotal').innerText = totalStok.toLocaleString();
+            document.getElementById('statSaldo').innerText = "Rp " + (totalSaldo).toLocaleString('id-ID');
+            
+            const statusBox = document.getElementById('statStatus');
+            if(totalStok < 10) {
+                statusBox.innerText = "KRITIS";
+                statusBox.className = "text-xl font-black text-red-500 italic";
+            } else {
+                statusBox.innerText = "AMAN";
+                statusBox.className = "text-xl font-black text-emerald-500 italic";
+            }
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000);
+        function removeItem(index) {
+            db.splice(index, 1);
+            localStorage.setItem('js_db', JSON.stringify(db));
+            render();
+        }
+
+        function clearData() {
+            if(confirm("Hapus semua data permanent?")) {
+                db = [];
+                localStorage.clear();
+                render();
+            }
+        }
+
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID');
+        }, 1000);
     </script>
 </body>
 </html>
