@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise OS v4.2 - CV Jasa Surya</title>
+    <title>Enterprise OS v4.3 - CV Jasa Surya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: #1e293b; margin: 0; }
         .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); }
         .sidebar-item.active { background: #2563eb; color: white; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); }
         .sidebar-item { color: #94a3b8; transition: all 0.3s; }
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Memastikan sidebar punya scroll sendiri jika layar kecil */
+        aside { height: 100%; display: flex; flex-direction: column; }
     </style>
 </head>
-<body class="min-h-screen lg:flex lg:items-center lg:justify-center p-0 lg:p-6">
+<body class="min-h-screen lg:flex lg:items-center lg:justify-center p-0 lg:p-4">
 
     <div id="loginPage" class="min-h-screen flex items-center justify-center p-6 w-full">
-        <div class="glass-card p-10 rounded-[3rem] w-full max-w-md shadow-2xl text-center fade-in">
+        <div class="glass-card p-10 rounded-[3rem] w-full max-w-md shadow-2xl text-center">
             <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black italic text-2xl mx-auto mb-6">f</div>
             <h2 class="text-3xl font-black text-slate-800 tracking-tight">Jasa Surya</h2>
             <p class="text-slate-400 font-medium mb-10 text-sm uppercase tracking-widest">Enterprise System</p>
@@ -33,111 +34,102 @@
         </div>
     </div>
 
-    <div id="mainDashboard" class="hidden glass-card w-full lg:max-w-[1440px] lg:h-[90vh] lg:rounded-[3rem] flex flex-col lg:row overflow-hidden shadow-2xl lg:flex-row">
+    <div id="mainDashboard" class="hidden glass-card w-full lg:max-w-[1400px] lg:h-[92vh] lg:rounded-[3rem] flex flex-col lg:flex-row overflow-hidden shadow-2xl">
         
-        <aside class="w-full lg:w-[300px] bg-white border-b lg:border-r border-slate-100 p-6 flex lg:flex-col shrink-0">
-            <div class="flex items-center justify-between lg:block">
-                <div class="flex items-center gap-3 mb-0 lg:mb-12">
+        <aside class="w-full lg:w-[280px] bg-white border-b lg:border-r border-slate-100 p-6 shrink-0">
+            <div class="flex items-center justify-between lg:block mb-8">
+                <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">f</div>
                     <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Flowly</h1>
                 </div>
-                <button onclick="logout()" class="lg:hidden text-red-500 font-bold text-xs bg-red-50 px-4 py-2 rounded-xl">Keluar</button>
             </div>
 
-            <nav class="flex lg:flex-col gap-3 flex-1 overflow-x-auto py-4 lg:py-0 mt-4 lg:mt-0">
-                <button onclick="switchTab('stok')" id="btn-stok" class="sidebar-item active px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-2">📦 Inventaris</button>
-                <button onclick="switchTab('uang')" id="btn-uang" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-2">💰 Keuangan</button>
-                <button onclick="switchTab('chart')" id="btn-chart" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-2">📊 Analitik</button>
+            <nav class="flex lg:flex-col gap-2 flex-1 overflow-x-auto lg:overflow-y-auto mb-6">
+                <button onclick="switchTab('stok')" id="btn-stok" class="sidebar-item active px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">📦 Inventaris</button>
+                <button onclick="switchTab('uang')" id="btn-uang" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">💰 Keuangan</button>
+                <button onclick="switchTab('chart')" id="btn-chart" class="sidebar-item px-6 py-4 rounded-2xl font-bold text-sm shrink-0 flex items-center gap-3">📊 Analitik</button>
             </nav>
 
-            <div class="hidden lg:block pt-6 border-t">
-                <div class="mb-4">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Waktu Sistem</p>
-                    <p id="clock" class="text-sm font-bold text-blue-600 font-mono">00:00:00</p>
-                </div>
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-4 rounded-2xl font-bold text-sm hover:bg-red-600 hover:text-white transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Log Out System
+            <div class="pt-4 border-t border-slate-100">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-3 bg-red-500 text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-red-700 shadow-lg shadow-red-100 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    LOG OUT
                 </button>
+                <p id="clock" class="text-center text-[10px] font-bold text-slate-400 mt-4 font-mono uppercase tracking-tighter">00:00:00</p>
             </div>
         </aside>
 
-        <main class="flex-1 p-6 lg:p-10 overflow-y-auto bg-slate-50/50">
+        <main class="flex-1 p-6 lg:p-10 overflow-y-auto bg-slate-50/40">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h2 id="pageTitle" class="text-2xl lg:text-3xl font-black text-slate-800">Inventaris</h2>
-                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1">CV Jasa Surya - Enterprise Admin</p>
+                    <h2 id="pageTitle" class="text-3xl font-black text-slate-800">Inventaris</h2>
+                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1">CV Jasa Surya - Enterprise System</p>
                 </div>
-                <button onclick="exportKeExcel()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2">
+                <button onclick="exportKeExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-100 transition-all flex items-center gap-2">
                     📥 Download Excel
                 </button>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Unit</p>
-                    <h3 id="statTotal" class="text-3xl font-black text-slate-800">0</h3>
+                    <h3 id="statTotal" class="text-4xl font-black text-slate-800">0</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Saldo Kas</p>
-                    <h3 id="statSaldo" class="text-2xl font-black text-emerald-600">Rp 0</h3>
+                    <h3 id="statSaldo" class="text-3xl font-black text-emerald-600">Rp 0</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Status</p>
-                    <h3 id="statStatus" class="text-xl font-black text-orange-500 uppercase italic">Aman</h3>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Status Sistem</p>
+                    <h3 id="statStatus" class="text-2xl font-black text-orange-500 uppercase italic">Kritis</h3>
                 </div>
             </div>
 
             <div id="section-stok" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-4">
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-                        <h4 class="font-bold text-slate-800 mb-4">Update Barang</h4>
-                        <div class="space-y-3">
-                            <input type="text" id="s1" placeholder="Nama Barang" class="w-full p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
-                            <input type="number" id="s2" placeholder="Qty" class="w-full p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
-                            <select id="s3" class="w-full p-4 rounded-xl bg-slate-50 font-bold outline-none">
-                                <option value="Masuk">Masuk (+)</option>
-                                <option value="Keluar">Keluar (-)</option>
-                            </select>
-                            <button onclick="simpan('stok')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg">Simpan</button>
-                        </div>
+                <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                    <h4 class="font-bold text-slate-800 mb-6 uppercase text-xs tracking-widest">Update Barang</h4>
+                    <div class="space-y-4">
+                        <input type="text" id="s1" placeholder="Nama Barang" class="w-full p-4 rounded-2xl bg-slate-50 outline-none border border-slate-100">
+                        <input type="number" id="s2" placeholder="Qty" class="w-full p-4 rounded-2xl bg-slate-50 outline-none border border-slate-100">
+                        <select id="s3" class="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none border border-slate-100">
+                            <option value="Masuk">Barang Masuk (+)</option>
+                            <option value="Keluar">Barang Keluar (-)</option>
+                        </select>
+                        <button onclick="simpan('stok')" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold shadow-lg shadow-blue-100">Simpan Data</button>
                     </div>
                 </div>
                 <div class="lg:col-span-8 space-y-3" id="list-stok"></div>
             </div>
 
             <div id="section-uang" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-4">
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-                        <h4 class="font-bold text-emerald-700 mb-4">Catat Uang</h4>
-                        <div class="space-y-3">
-                            <input type="text" id="u1" placeholder="Keterangan" class="w-full p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500">
-                            <input type="number" id="u2" placeholder="Nominal Rp" class="w-full p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500">
-                            <select id="u3" class="w-full p-4 rounded-xl bg-slate-50 font-bold outline-none">
-                                <option value="Masuk">Uang Masuk (+)</option>
-                                <option value="Keluar">Uang Keluar (-)</option>
-                            </select>
-                            <button onclick="simpan('uang')" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg">Simpan</button>
-                        </div>
+                <div class="lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-white h-fit">
+                    <h4 class="font-bold text-emerald-700 mb-6 uppercase text-xs tracking-widest">Catat Keuangan</h4>
+                    <div class="space-y-4">
+                        <input type="text" id="u1" placeholder="Keterangan" class="w-full p-4 rounded-2xl bg-slate-50 outline-none border border-slate-100">
+                        <input type="number" id="u2" placeholder="Nominal Rp" class="w-full p-4 rounded-2xl bg-slate-50 outline-none border border-slate-100">
+                        <select id="u3" class="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none border border-slate-100">
+                            <option value="Masuk">Uang Masuk (+)</option>
+                            <option value="Keluar">Uang Keluar (-)</option>
+                        </select>
+                        <button onclick="simpan('uang')" class="w-full bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-lg shadow-emerald-100">Simpan Transaksi</button>
                     </div>
                 </div>
                 <div class="lg:col-span-8 space-y-3" id="list-uang"></div>
             </div>
 
-            <div id="section-chart" class="hidden bg-white p-8 rounded-[2.5rem] shadow-xl h-[400px]">
-                <h4 class="font-bold text-slate-800 mb-4">Arus Kas Keuangan</h4>
-                <div class="h-full pb-10"><canvas id="mainChart"></canvas></div>
+            <div id="section-chart" class="hidden bg-white p-10 rounded-[3rem] shadow-xl h-[500px]">
+                <h4 class="font-bold text-slate-800 mb-6 uppercase text-xs tracking-widest">Visualisasi Arus Kas</h4>
+                <div class="h-full pb-16"><canvas id="mainChart"></canvas></div>
             </div>
         </main>
     </div>
 
     <script>
-        let db_stok = JSON.parse(localStorage.getItem('v41_stok')) || [];
-        let db_uang = JSON.parse(localStorage.getItem('v41_uang')) || [];
+        let db_stok = JSON.parse(localStorage.getItem('v43_stok')) || [];
+        let db_uang = JSON.parse(localStorage.getItem('v43_uang')) || [];
         let currentTab = 'stok';
         let chartObj = null;
 
-        // --- FUNGSI LOGIN & LOGOUT ---
         function login() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
@@ -145,21 +137,15 @@
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 refreshData();
-            } else { alert("Login Salah!"); }
+            } else { alert("User atau Password salah!"); }
         }
 
         function logout() {
-            if(confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
-                // Sembunyikan Dashboard, Tampilkan Login
+            if(confirm("Keluar dari sistem?")) {
                 document.getElementById('mainDashboard').classList.add('hidden');
                 document.getElementById('loginPage').classList.remove('hidden');
-                
-                // Reset input login agar kosong
                 document.getElementById('user').value = '';
                 document.getElementById('pass').value = '';
-                
-                // Opsional: Reload untuk membersihkan sisa memori JS
-                // location.reload(); 
             }
         }
 
@@ -173,7 +159,6 @@
             document.getElementById('btn-'+t).classList.add('active');
             document.getElementById('pageTitle').innerText = t === 'stok' ? 'Inventaris' : t === 'uang' ? 'Keuangan' : 'Analitik';
             if(t === 'chart') initChart();
-            refreshData();
         }
 
         function simpan(type) {
@@ -182,14 +167,14 @@
             const v3 = document.getElementById(type==='stok'?'s3':'u3').value;
             const time = new Date().toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
 
-            if(!v1 || !v2) return alert("Isi Data!");
+            if(!v1 || isNaN(v2)) return alert("Mohon lengkapi data!");
 
             if(type === 'stok') {
                 db_stok.unshift({ nama: v1, qty: v2, tipe: v3, waktu: time });
-                localStorage.setItem('v41_stok', JSON.stringify(db_stok));
+                localStorage.setItem('v43_stok', JSON.stringify(db_stok));
             } else {
                 db_uang.unshift({ ket: v1, nominal: v2, tipe: v3, waktu: time });
-                localStorage.setItem('v41_uang', JSON.stringify(db_uang));
+                localStorage.setItem('v43_uang', JSON.stringify(db_uang));
             }
             document.getElementById(type==='stok'?'s1':'u1').value = '';
             document.getElementById(type==='stok'?'s2':'u2').value = '';
@@ -199,7 +184,7 @@
         function hapus(type, i) {
             if(!confirm("Hapus data ini?")) return;
             if(type==='stok') db_stok.splice(i, 1); else db_uang.splice(i, 1);
-            localStorage.setItem(type==='stok'?'v41_stok':'v41_uang', JSON.stringify(type==='stok'?db_stok:db_uang));
+            localStorage.setItem(type==='stok'?'v43_stok':'v43_uang', JSON.stringify(type==='stok'?db_stok:db_uang));
             refreshData();
         }
 
@@ -211,12 +196,12 @@
             let sTotal = 0;
             db_stok.forEach((x, i) => {
                 sTotal += (x.tipe === 'Masuk' ? x.qty : -x.qty);
-                lStok.innerHTML += `<div class="bg-white p-4 px-6 rounded-2xl flex items-center justify-between shadow-sm border border-slate-50">
-                    <div><p class="font-bold text-slate-700 text-sm">${x.nama}</p><p class="text-[10px] text-slate-400 font-bold">${x.waktu}</p></div>
-                    <div class="flex items-center gap-4">
-                        <span class="text-[10px] font-bold ${x.tipe==='Masuk'?'text-blue-500':'text-orange-500'}">${x.tipe}</span>
-                        <p class="font-black text-slate-800 text-sm w-12 text-right">${x.qty}</p>
-                        <button onclick="hapus('stok',${i})" class="text-red-300">✕</button>
+                lStok.innerHTML += `<div class="bg-white p-5 px-8 rounded-3xl flex items-center justify-between shadow-sm border border-slate-50 hover:border-blue-200 transition">
+                    <div><p class="font-bold text-slate-700 text-sm">${x.nama}</p><p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${x.waktu}</p></div>
+                    <div class="flex items-center gap-6">
+                        <span class="text-[9px] font-black px-3 py-1 rounded-full ${x.tipe==='Masuk'?'bg-blue-50 text-blue-500':'bg-orange-50 text-orange-500'}">${x.tipe.toUpperCase()}</span>
+                        <p class="font-black text-slate-800 text-base w-12 text-right">${x.qty}</p>
+                        <button onclick="hapus('stok',${i})" class="text-red-300 hover:text-red-500">✕</button>
                     </div>
                 </div>`;
             });
@@ -224,42 +209,39 @@
             let uTotal = 0;
             db_uang.forEach((x, i) => {
                 uTotal += (x.tipe === 'Masuk' ? x.nominal : -x.nominal);
-                lUang.innerHTML += `<div class="bg-white p-4 px-6 rounded-2xl flex items-center justify-between shadow-sm border border-slate-50">
-                    <div><p class="font-bold text-slate-700 text-sm">${x.ket}</p><p class="text-[10px] text-slate-400 font-bold">${x.waktu}</p></div>
-                    <div class="flex items-center gap-4">
+                lUang.innerHTML += `<div class="bg-white p-5 px-8 rounded-3xl flex items-center justify-between shadow-sm border border-slate-50 hover:border-emerald-200 transition">
+                    <div><p class="font-bold text-slate-700 text-sm">${x.ket}</p><p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${x.waktu}</p></div>
+                    <div class="flex items-center gap-6">
                         <p class="font-black ${x.tipe==='Masuk'?'text-emerald-600':'text-red-500'} text-sm">Rp ${x.nominal.toLocaleString()}</p>
-                        <button onclick="hapus('uang',${i})" class="text-red-300">✕</button>
+                        <button onclick="hapus('uang',${i})" class="text-red-300 hover:text-red-500">✕</button>
                     </div>
                 </div>`;
             });
 
             document.getElementById('statTotal').innerText = sTotal;
             document.getElementById('statSaldo').innerText = "Rp " + uTotal.toLocaleString('id-ID');
-            document.getElementById('statStatus').innerText = sTotal < 5 ? "Kritis" : "Aman";
-            document.getElementById('statStatus').className = sTotal < 5 ? "text-xl font-black text-red-500 uppercase" : "text-xl font-black text-emerald-500 uppercase";
+            const st = document.getElementById('statStatus');
+            st.innerText = sTotal < 5 ? "KRITIS" : "STABIL";
+            st.className = sTotal < 5 ? "text-2xl font-black text-red-500 italic uppercase" : "text-2xl font-black text-emerald-500 italic uppercase";
         }
 
         function exportKeExcel() {
-            const dataTarget = currentTab === 'stok' ? db_stok : db_uang;
-            if(dataTarget.length === 0) return alert("Data Kosong!");
-            const rows = dataTarget.map(item => {
-                if(currentTab === 'stok') { return { "Waktu": item.waktu, "Nama Barang": item.nama, "Jenis": item.tipe, "Jumlah": item.qty }; } 
-                else { return { "Waktu": item.waktu, "Keterangan": item.ket, "Jenis": item.tipe, "Nominal": item.nominal }; }
-            });
-            const worksheet = XLSX.utils.json_to_sheet(rows);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
-            XLSX.writeFile(workbook, `Laporan_${currentTab}_JasaSurya.xlsx`);
+            const data = currentTab === 'stok' ? db_stok : db_uang;
+            if(data.length === 0) return alert("Data kosong!");
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, `Laporan_JasaSurya_${currentTab}.xlsx`);
         }
 
         function initChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartObj) chartObj.destroy();
-            const m = db_uang.filter(u => u.tipe==='Masuk').reduce((a,b)=>a+b.nominal,0);
-            const k = db_uang.filter(u => u.tipe==='Keluar').reduce((a,b)=>a+b.nominal,0);
+            const inSum = db_uang.filter(u => u.tipe==='Masuk').reduce((a,b)=>a+b.nominal,0);
+            const outSum = db_uang.filter(u => u.tipe==='Keluar').reduce((a,b)=>a+b.nominal,0);
             chartObj = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['Masuk', 'Keluar'], datasets: [{ data: [m, k], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 15 }] },
+                data: { labels: ['Pemasukan', 'Pengeluaran'], datasets: [{ data: [inSum, outSum], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 20 }] },
                 options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
