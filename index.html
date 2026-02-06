@@ -12,9 +12,16 @@
         .sidebar-gradient { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
         .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
         .hidden { display: none; }
-        .active-tab { background: #2563eb; color: white; shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
+        .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
+        
+        /* Animasi Loading */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Notifikasi Stok Menipis */
         @keyframes pulse-red { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #fecaca; } }
         .low-stock { animation: pulse-red 2s infinite; color: #dc2626; font-weight: bold; }
+        
         @media print { .no-print { display: none; } .print-only { display: block !important; } }
         .print-only { display: none; }
     </style>
@@ -24,14 +31,14 @@
     <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-10 rounded-[2rem] card-shadow w-full max-w-md border border-slate-200">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-black text-slate-900">CV JASA SURYA</h2>
-                <p class="text-slate-500 text-sm mt-1">Enterprise Resource Planning</p>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tighter">CV JASA SURYA</h2>
+                <p class="text-slate-500 text-sm mt-1 uppercase tracking-widest font-bold">Enterprise System</p>
             </div>
             <div class="space-y-4">
-                <input type="text" id="username" placeholder="Username (admin/staff)" class="w-full px-5 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="username" placeholder="Username" class="w-full px-5 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                 <input type="password" id="password" placeholder="Password" class="w-full px-5 py-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                 <button onclick="handleLogin()" id="btnLogin" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-3">
-                    Akses Sistem
+                    Masuk Ke Sistem
                 </button>
             </div>
         </div>
@@ -39,20 +46,20 @@
 
     <div id="mainDashboard" class="hidden min-h-screen flex flex-col md:flex-row no-print">
         <aside class="w-full md:w-72 sidebar-gradient text-white p-8 flex flex-col">
-            <div class="mb-10 text-center md:text-left">
+            <div class="mb-10">
                 <h1 class="text-2xl font-black tracking-tighter">JASA SURYA</h1>
                 <p id="userRoleBadge" class="text-[10px] bg-blue-500/20 text-blue-300 inline-block px-2 py-0.5 rounded-full mt-1 border border-blue-500/30 font-bold uppercase"></p>
             </div>
             
             <nav class="space-y-2 flex-1">
                 <button onclick="switchTab('stok')" id="tabStok" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold active-tab transition text-sm">Inventaris Buku</button>
-                <button onclick="switchTab('keuangan')" id="tabKeuangan" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm">Laporan Keuangan</button>
-                <button onclick="switchTab('analitik')" id="tabAnalitik" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm">Analitik & Grafik</button>
+                <button onclick="switchTab('keuangan')" id="tabKeuangan" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm">Keuangan</button>
+                <button onclick="switchTab('analitik')" id="tabAnalitik" class="w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm">Grafik Analitik</button>
             </nav>
 
             <div class="mt-auto pt-6 border-t border-slate-700">
                 <p id="realTimeClock" class="text-2xl font-mono font-bold text-blue-400">00:00:00</p>
-                <p id="realDate" class="text-[10px] text-slate-500 uppercase font-bold mb-4">---</p>
+                <p id="realDate" class="text-[10px] text-slate-500 uppercase font-bold mb-4">Memuat...</p>
                 <button onclick="handleLogout()" class="w-full bg-red-500/10 text-red-400 border border-red-500/20 py-3 rounded-xl text-sm font-bold hover:bg-red-500 hover:text-white transition">Sign Out</button>
             </div>
         </aside>
@@ -60,53 +67,53 @@
         <main class="flex-1 p-6 md:p-12 overflow-y-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <div class="bg-white p-8 rounded-[2rem] card-shadow border border-white">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Stok Unit</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Stok Buku</p>
                     <p id="statTotalBuku" class="text-4xl font-black mt-2">0</p>
                 </div>
                 <div id="cardSaldo" class="bg-white p-8 rounded-[2rem] card-shadow border border-white">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Saldo Kas (IDR)</p>
-                    <p id="statSaldo" class="text-4xl font-black mt-2 text-emerald-600">0</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Saldo Kas</p>
+                    <p id="statSaldo" class="text-3xl font-black mt-2 text-emerald-600">Rp 0</p>
                 </div>
                 <div class="bg-orange-500 p-8 rounded-[2rem] card-shadow text-white">
-                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Peringatan Stok</p>
-                    <p id="statAlert" class="text-4xl font-black mt-2">0 <span class="text-sm font-normal">Item Menipis</span></p>
+                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Limit Stok</p>
+                    <p id="statAlert" class="text-4xl font-black mt-2">0 <span class="text-sm font-normal">Menipis</span></p>
                 </div>
             </div>
 
             <div id="sectionStok" class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white p-8 rounded-[2rem] card-shadow">
-                        <h3 class="font-black text-xl mb-6">Update Inventaris</h3>
+                        <h3 class="font-black text-xl mb-6">Input Inventaris</h3>
                         <div class="space-y-4">
                             <input type="text" id="bukuNama" placeholder="Judul Buku" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                            <input type="number" id="bukuQty" placeholder="Jumlah (Qty)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="bukuQty" placeholder="Jumlah" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                             <select id="bukuTipe" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold">
-                                <option value="Masuk">Stok Masuk (+)</option>
-                                <option value="Keluar">Stok Keluar (-)</option>
+                                <option value="Masuk">Buku Masuk (+)</option>
+                                <option value="Keluar">Buku Keluar (-)</option>
                             </select>
-                            <button onclick="tambahBuku()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Update Stok</button>
+                            <button onclick="tambahBuku()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition">Simpan Data</button>
                         </div>
                     </div>
                 </div>
                 <div class="lg:col-span-8 bg-white rounded-[2rem] card-shadow overflow-hidden border">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 text-[10px] font-black uppercase tracking-tighter text-slate-400 border-b">
-                            <tr><th class="p-6">Waktu</th><th class="p-6">Informasi Buku</th><th class="p-6">Tipe</th><th class="p-6">Qty</th><th class="p-6">Aksi</th></tr>
+                        <thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b">
+                            <tr><th class="p-6">Waktu</th><th class="p-6">Nama Buku</th><th class="p-6">Status</th><th class="p-6">Qty</th><th class="p-6">Aksi</th></tr>
                         </thead>
-                        <tbody id="listBuku" class="divide-y text-sm font-medium"></tbody>
+                        <tbody id="listBuku" class="divide-y text-sm"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="sectionKeuangan" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-10">
                 <div class="lg:col-span-4 bg-white p-8 rounded-[2rem] card-shadow h-fit">
-                    <h3 class="font-black text-xl mb-6 text-emerald-700">Pencatatan Kas</h3>
+                    <h3 class="font-black text-xl mb-6 text-emerald-700">Catat Arus Kas</h3>
                     <div class="space-y-4">
-                        <input type="text" id="uangKet" placeholder="Nama Transaksi" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
-                        <input type="number" id="uangNominal" placeholder="Nominal (Rp)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="text" id="uangKet" placeholder="Keterangan" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="number" id="uangNominal" placeholder="Nominal Rp" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500">
                         <select id="uangTipe" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold">
-                            <option value="Masuk">Uang Masuk (Debit)</option>
-                            <option value="Keluar">Uang Keluar (Kredit)</option>
+                            <option value="Masuk">Uang Masuk (+)</option>
+                            <option value="Keluar">Uang Keluar (-)</option>
                         </select>
                         <button onclick="tambahUang()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition">Simpan Transaksi</button>
                     </div>
@@ -114,7 +121,7 @@
                 <div class="lg:col-span-8 bg-white rounded-[2rem] card-shadow overflow-hidden border">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400 border-b">
-                            <tr><th class="p-6">Waktu</th><th class="p-6">Keterangan</th><th class="p-6">Nominal</th><th class="p-6 text-center">Opsi</th></tr>
+                            <tr><th class="p-6">Waktu</th><th class="p-6">Keterangan</th><th class="p-6">Nominal</th><th class="p-6 text-center">Aksi</th></tr>
                         </thead>
                         <tbody id="listUang" class="divide-y text-sm"></tbody>
                     </table>
@@ -123,7 +130,7 @@
 
             <div id="sectionAnalitik" class="hidden space-y-10">
                 <div class="bg-white p-10 rounded-[2rem] card-shadow border">
-                    <h3 class="font-black text-2xl mb-8">Visualisasi Arus Kas</h3>
+                    <h3 class="font-black text-2xl mb-8">Statistik Uang Masuk & Keluar</h3>
                     <div class="h-[400px]">
                         <canvas id="cashFlowChart"></canvas>
                     </div>
@@ -134,16 +141,16 @@
 
     <div id="printArea" class="print-only p-10 text-center">
         <h1 class="text-2xl font-bold">CV JASA SURYA</h1>
-        <p>Bukti Transaksi Digital</p>
+        <p>Nota Transaksi Digital</p>
         <hr class="my-4 border-dashed">
         <div id="printContent" class="text-left space-y-2"></div>
         <hr class="my-4 border-dashed">
-        <p class="text-xs">Terima kasih atas kerjasamanya.</p>
+        <p class="text-xs">Dicetak secara otomatis oleh sistem.</p>
     </div>
 
     <script>
-        let dataBuku = JSON.parse(localStorage.getItem('js_mega_buku')) || [];
-        let dataUang = JSON.parse(localStorage.getItem('js_mega_uang')) || [];
+        let dataBuku = JSON.parse(localStorage.getItem('js_final_buku')) || [];
+        let dataUang = JSON.parse(localStorage.getItem('js_final_uang')) || [];
         let currentUser = null;
         let chartInstance = null;
 
@@ -152,18 +159,28 @@
             document.getElementById('realTimeClock').innerText = now.toLocaleTimeString('id-ID');
             document.getElementById('realDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         }
-        setInterval(updateClock, 1000);
+        setInterval(updateClock, 1000); updateClock();
 
         function handleLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
-            if(p === '123') { // Simple pass for demo
-                currentUser = u === 'admin' ? 'Owner' : 'Staff';
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
-                document.getElementById('userRoleBadge').innerText = currentUser;
-                renderAll();
-            } else { alert("Password salah! (Gunakan 123)"); }
+            const btn = document.getElementById('btnLogin');
+
+            // Logika Login: admin admin atau staff staff
+            if((u === 'admin' && p === 'admin') || (u === 'staff' && p === 'staff')) {
+                btn.classList.add('opacity-50', 'pointer-events-none');
+                btn.innerHTML = `<span class="loader"></span> Memproses...`;
+                
+                setTimeout(() => {
+                    currentUser = u === 'admin' ? 'Owner' : 'Staff';
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('mainDashboard').classList.remove('hidden');
+                    document.getElementById('userRoleBadge').innerText = currentUser;
+                    renderAll();
+                }, 1000);
+            } else {
+                alert("Login Gagal! Gunakan admin / admin.");
+            }
         }
 
         function handleLogout() { location.reload(); }
@@ -171,6 +188,11 @@
         function switchTab(tab) {
             ['sectionStok', 'sectionKeuangan', 'sectionAnalitik'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById('section' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+            
+            // Highlight Tab
+            ['tabStok', 'tabKeuangan', 'tabAnalitik'].forEach(t => document.getElementById(t).className = 'w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-slate-400 hover:bg-slate-800 transition text-sm text-left');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = 'w-full flex items-center gap-3 p-4 rounded-2xl font-bold active-tab transition text-sm text-left';
+            
             if(tab === 'analitik') initChart();
         }
 
@@ -180,8 +202,9 @@
             const t = document.getElementById('bukuTipe').value;
             if(n && q) {
                 dataBuku.unshift({ id: Date.now(), nama: n, qty: q, tipe: t, waktu: new Date().toLocaleString('id-ID') });
-                localStorage.setItem('js_mega_buku', JSON.stringify(dataBuku));
+                localStorage.setItem('js_final_buku', JSON.stringify(dataBuku));
                 renderAll();
+                document.getElementById('bukuNama').value = ''; document.getElementById('bukuQty').value = '';
             }
         }
 
@@ -191,9 +214,30 @@
             const t = document.getElementById('uangTipe').value;
             if(k && n) {
                 dataUang.unshift({ id: Date.now(), ket: k, nominal: n, tipe: t, waktu: new Date().toLocaleString('id-ID') });
-                localStorage.setItem('js_mega_uang', JSON.stringify(dataUang));
+                localStorage.setItem('js_final_uang', JSON.stringify(dataUang));
                 renderAll();
+                document.getElementById('uangKet').value = ''; document.getElementById('uangNominal').value = '';
             }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('cashFlowChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            const masuk = dataUang.filter(u => u.tipe === 'Masuk').reduce((a, b) => a + b.nominal, 0);
+            const keluar = dataUang.filter(u => u.tipe === 'Keluar').reduce((a, b) => a + b.nominal, 0);
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pemasukan', 'Pengeluaran'],
+                    datasets: [{
+                        label: 'Rupiah',
+                        data: [masuk, keluar],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 10
+                    }]
+                },
+                options: { maintainAspectRatio: false }
+            });
         }
 
         function cetakStruk(id) {
@@ -201,99 +245,64 @@
             document.getElementById('printContent').innerHTML = `
                 <p><b>Waktu:</b> ${u.waktu}</p>
                 <p><b>Keterangan:</b> ${u.ket}</p>
-                <p><b>Tipe:</b> ${u.tipe}</p>
                 <p><b>Nominal:</b> Rp ${u.nominal.toLocaleString()}</p>
+                <p><b>Status:</b> ${u.tipe}</p>
             `;
             window.print();
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('cashFlowChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            
-            const masuk = dataUang.filter(u => u.tipe === 'Masuk').reduce((a, b) => a + b.nominal, 0);
-            const keluar = dataUang.filter(u => u.tipe === 'Keluar').reduce((a, b) => a + b.nominal, 0);
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Uang Masuk (Debit)', 'Uang Keluar (Kredit)'],
-                    datasets: [{
-                        label: 'Total Rupiah',
-                        data: [masuk, keluar],
-                        backgroundColor: ['#10b981', '#ef4444'],
-                        borderRadius: 15
-                    }]
-                },
-                options: { maintainAspectRatio: false }
-            });
         }
 
         function renderAll() {
             // Render Stok
             const listBuku = document.getElementById('listBuku');
             listBuku.innerHTML = '';
-            let alertCount = 0;
-            let totalStok = 0;
-
+            let lowCount = 0; let totalStok = 0;
             dataBuku.forEach(b => {
-                const isLow = b.qty <= 5;
-                if(isLow) alertCount++;
+                const isLow = b.qty <= 5; if(isLow) lowCount++;
                 totalStok += b.qty;
-                listBuku.innerHTML += `
-                    <tr class="${isLow ? 'low-stock' : 'hover:bg-slate-50'}">
-                        <td class="p-6 text-xs text-slate-400 font-mono">${b.waktu}</td>
-                        <td class="p-6 font-bold">${b.nama} ${isLow ? '⚠️' : ''}</td>
-                        <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${b.tipe==='Masuk'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'}">${b.tipe}</span></td>
-                        <td class="p-6 font-black text-center">${b.qty}</td>
-                        <td class="p-6 text-center">
-                            ${currentUser === 'Owner' ? `<button onclick="hapus('buku',${b.id})" class="text-red-400">Hapus</button>` : '-'}
-                        </td>
-                    </tr>`;
+                listBuku.innerHTML += `<tr class="${isLow ? 'low-stock' : 'hover:bg-slate-50'}">
+                    <td class="p-6 text-xs text-slate-400 font-mono">${b.waktu}</td>
+                    <td class="p-6 font-bold">${b.nama}</td>
+                    <td class="p-6"><span class="px-2 py-1 rounded-full text-[10px] font-black uppercase ${b.tipe==='Masuk'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'}">${b.tipe}</span></td>
+                    <td class="p-6 font-black">${b.qty}</td>
+                    <td class="p-6">${currentUser === 'Owner' ? `<button onclick="hapus('buku',${b.id})" class="text-red-400">Hapus</button>` : '-'}</td>
+                </tr>`;
             });
 
-            // Render Keuangan
+            // Render Uang
             const listUang = document.getElementById('listUang');
             listUang.innerHTML = '';
             let saldo = 0;
             dataUang.forEach(u => {
                 if(u.tipe === 'Masuk') saldo += u.nominal; else saldo -= u.nominal;
-                listUang.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-6 text-xs text-slate-400 font-mono">${u.waktu}</td>
-                        <td class="p-6 font-bold">${u.ket}</td>
-                        <td class="p-6 font-black ${u.tipe==='Masuk'?'text-emerald-600':'text-red-600'}">Rp ${u.nominal.toLocaleString()}</td>
-                        <td class="p-6 flex gap-2 justify-center">
-                            <button onclick="cetakStruk(${u.id})" class="bg-slate-100 p-2 rounded-lg text-xs font-bold">Struk</button>
-                            ${currentUser === 'Owner' ? `<button onclick="hapus('uang',${u.id})" class="text-red-400 text-xs">Hapus</button>` : ''}
-                        </td>
-                    </tr>`;
+                listUang.innerHTML += `<tr class="hover:bg-slate-50">
+                    <td class="p-6 text-xs text-slate-400 font-mono">${u.waktu}</td>
+                    <td class="p-6 font-bold">${u.ket}</td>
+                    <td class="p-6 font-black ${u.tipe==='Masuk'?'text-emerald-600':'text-red-600'}">Rp ${u.nominal.toLocaleString()}</td>
+                    <td class="p-6 flex gap-2 justify-center">
+                        <button onclick="cetakStruk(${u.id})" class="bg-slate-100 p-2 rounded-lg text-xs font-bold">Nota</button>
+                        ${currentUser === 'Owner' ? `<button onclick="hapus('uang',${u.id})" class="text-red-400">Hapus</button>` : ''}
+                    </td>
+                </tr>`;
             });
 
-            // Update Stats
             document.getElementById('statTotalBuku').innerText = totalStok;
-            document.getElementById('statSaldo').innerText = "Rp " + saldo.toLocaleString();
-            document.getElementById('statAlert').innerText = alertCount;
-            document.getElementById('statTotalEntri').innerText = dataBuku.length + dataUang.length + " Entri";
-            
-            // Level Akses: Sembunyikan saldo jika staff
+            document.getElementById('statAlert').innerText = lowCount;
             if(currentUser === 'Staff') {
-                document.getElementById('cardSaldo').classList.add('opacity-20', 'grayscale');
                 document.getElementById('statSaldo').innerText = "********";
+                document.getElementById('cardSaldo').classList.add('opacity-30');
             } else {
-                document.getElementById('cardSaldo').classList.remove('opacity-20', 'grayscale');
+                document.getElementById('statSaldo').innerText = "Rp " + saldo.toLocaleString();
+                document.getElementById('cardSaldo').classList.remove('opacity-30');
             }
         }
 
         function hapus(type, id) {
-            if(!confirm("Hapus data permanen?")) return;
+            if(!confirm("Hapus data ini?")) return;
             if(type === 'buku') dataBuku = dataBuku.filter(x => x.id !== id);
             else dataUang = dataUang.filter(x => x.id !== id);
-            localStorage.setItem(type === 'buku' ? 'js_mega_buku' : 'js_mega_uang', JSON.stringify(type === 'buku' ? dataBuku : dataUang));
+            localStorage.setItem(type === 'buku' ? 'js_final_buku' : 'js_final_uang', JSON.stringify(type === 'buku' ? dataBuku : dataUang));
             renderAll();
         }
-
-        window.onload = updateClock;
     </script>
 </body>
 </html>
